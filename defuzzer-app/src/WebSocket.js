@@ -1,6 +1,6 @@
 import React, { createContext } from "react";
 import io from "socket.io-client";
-import { WS_BASE } from "./config";
+import { WS_BASE, WS_BASE_PRODUCTION } from "./config";
 import { useDispatch } from "react-redux";
 import { updateChatLog, updateUsers } from "./actions";
 
@@ -34,7 +34,9 @@ export default ({ children }) => {
   };
 
   if (!socket) {
-    socket = io.connect(WS_BASE);
+    const api =
+      process.env.NODE_ENV === "production" ? WS_BASE_PRODUCTION : WS_BASE;
+    socket = io.connect(api);
 
     socket.on("event://get-message", (msg) => {
       const payload = JSON.parse(msg);

@@ -1,11 +1,14 @@
 // actions.js
 import axios from "axios";
-import { API_BASE } from "./config";
+import { API_BASE, API_BASE_PRODUCTION } from "./config";
 
 // These are our action types
 export const CREATE_ROOM_REQUEST = "CREATE_ROOM_REQUEST";
 export const CREATE_ROOM_SUCCESS = "CREATE_ROOM_SUCCESS";
 export const CREATE_ROOM_ERROR = "CREATE_ROOM_ERROR";
+
+const apiBase =
+  process.env.NODE_ENV === "production" ? API_BASE_PRODUCTION : API_BASE;
 
 // Now we define actions
 export function createRoomRequest() {
@@ -32,7 +35,7 @@ export function createRoom(roomName, navigate) {
   return async function (dispatch) {
     dispatch(createRoomRequest());
     try {
-      const response = await axios.get(`${API_BASE}/room?name=${roomName}`);
+      const response = await axios.get(`${apiBase}/room?name=${roomName}`);
       dispatch(createRoomSuccess(response.data));
       navigate(`/room/${response.data.id}`);
     } catch (error) {
@@ -69,7 +72,7 @@ export function joinRoom(roomId, navigate) {
   return async function (dispatch) {
     dispatch(joinRoomRequest());
     try {
-      const response = await axios.get(`${API_BASE}/room/${roomId}`);
+      const response = await axios.get(`${apiBase}/room/${roomId}`);
       dispatch(joinRoomSuccess(response.data));
       navigate(`/room/${roomId}`);
     } catch (error) {

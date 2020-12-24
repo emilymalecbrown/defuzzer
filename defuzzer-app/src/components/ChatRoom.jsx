@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { useParams, useNavigate } from "react-router-dom";
 import { WebSocketContext } from "src/WebSocket";
 import { setUsername, joinRoom } from "src/actions";
-import { UserList, Flex, Input } from "src/styled-components";
+import { Box, Flex, Input } from "src/styled-components";
 
 export const ChatRoom = () => {
   const [usernameInput, setUsernameInput] = useState("");
@@ -69,24 +69,20 @@ export const ChatRoom = () => {
       )}
       {username && (
         <div>
-          <Flex>
-            <div
-              style={{
-                width: "400px",
-                height: "100px",
-              }}
-            >
+          <Flex justifyContent={"space-between"}>
+            <div>
+              <ul>
+                {users && users.map((user) => <li key={user}>{user}</li>)}
+              </ul>
+            </div>
+            <Box width={"60vw"}>
               {chats.map((c, i) => (
                 <div key={i}>
                   <i>{c.username}:</i> {c.message}
                 </div>
               ))}
-            </div>
-            <UserList>
-              <ul>
-                {users && users.map((user) => <li key={user}>{user}</li>)}
-              </ul>
-            </UserList>
+            </Box>
+            <div></div>
           </Flex>
           <Flex>
             <Input
