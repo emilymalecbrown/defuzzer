@@ -12,6 +12,8 @@ const chatLogs = {};
 
 app.use(cors());
 
+app.use(express.static(__dirname + "/public/build"));
+
 app.get("/room", function (req, res, next) {
   const room = {
     name: req.query.name,
@@ -60,6 +62,6 @@ io.on("connection", function (socket) {
   });
 });
 
-http.listen(5000, function () {
-  console.log("listening on *:5000");
+http.listen(process.env.PORT || 5000, function () {
+  console.log(`listening on ${process.env.PORT || 5000}`);
 });
