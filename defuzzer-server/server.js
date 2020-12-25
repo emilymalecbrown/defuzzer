@@ -12,8 +12,6 @@ const chatLogs = {};
 
 app.use(cors());
 
-app.use(express.static(__dirname + "/public/build"));
-
 app.get("/room", function (req, res, next) {
   const room = {
     name: req.query.name,
