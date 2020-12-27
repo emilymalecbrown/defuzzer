@@ -72,14 +72,22 @@ export const ChatRoom = () => {
           <Flex justifyContent={"space-between"}>
             <div>
               <ul>
-                {users && users.map((user) => <li key={user}>{user}</li>)}
+                {users &&
+                  users.map((user, index) => (
+                    <li key={`${user}-${index}`}>{user}</li>
+                  ))}
               </ul>
             </div>
-            <Box width={"60vw"}>
+            <Box width={"60%"}>
               {chats.map((c, i) => (
-                <div key={i}>
-                  <i>{c.username}:</i> {c.message}
-                </div>
+                <Flex
+                  key={i}
+                  display={"flex"}
+                  flexDirection={"column-reverse"}
+                  alignItems={"start"}
+                >
+                  {c.username}: {c.message}
+                </Flex>
               ))}
             </Box>
             <div></div>

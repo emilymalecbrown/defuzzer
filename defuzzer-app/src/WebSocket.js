@@ -44,9 +44,7 @@ export default ({ children }) => {
     });
 
     socket.on("event://user-connected", (msg) => {
-      console.log(msg);
       const payload = JSON.parse(msg);
-      console.log("IN THE ON EVENT");
       dispatch(updateUsers(payload));
     });
 
