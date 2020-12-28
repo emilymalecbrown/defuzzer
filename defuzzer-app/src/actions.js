@@ -73,7 +73,7 @@ export function joinRoom(roomId, navigate) {
     dispatch(joinRoomRequest());
     try {
       const response = await axios.get(`${apiBase}/room/${roomId}`);
-      dispatch(joinRoomSuccess(response.data));
+      dispatch(joinRoomSuccess(response.data.room));
       navigate(`/room/${roomId}`);
     } catch (error) {
       dispatch(joinRoomError(error));

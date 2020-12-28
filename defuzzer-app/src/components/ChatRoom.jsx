@@ -12,7 +12,9 @@ export const ChatRoom = () => {
   const room = useSelector((state) => state.room);
   const username = useSelector((state) => state.username);
   const chats = useSelector((state) => state.chatLog);
-  const users = useSelector((state) => state.users);
+  const users = useSelector((state) =>
+    state.users ? Object.values(state.users) : []
+  );
 
   const dispatch = useDispatch();
   const ws = useContext(WebSocketContext);
@@ -48,6 +50,8 @@ export const ChatRoom = () => {
   }, [room, params, navigate, dispatch]);
 
   if (!room) return null;
+
+  console.log(room);
 
   return (
     <div>

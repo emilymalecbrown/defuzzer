@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const express = require("express");
 const app = express();
 // const expressWs = require('express-ws')(app);
@@ -7,56 +9,74 @@ const io = require("socket.io")(http);
 const cors = require("cors");
 const uuidv4 = require("uuid").v4;
 
-const rooms = {};
-const chatLogs = {};
+const db = require("./db").db;
 
 app.use(cors());
 
-app.get("/room", function (req, res, next) {
-  const room = {
-    name: req.query.name,
-    id: uuidv4(),
-  };
-  rooms[room.id] = room;
-  rooms[room.id].users = [];
-  chatLogs[room.id] = [];
+const roomsRef = db.ref("rooms");
+const chatsRef = db.ref("chats");
 
-  res.json(room);
+app.get("/room", async (req, res) => {
+  const roomId = uuidv4();
+
+  await roomsRef.child(roomId).set({
+    name: req.query.name,
+    id: roomId,
+    users: {},
+  });
+  await chatsRef.child(roomId).set([]);
+
+  const roomSnapshot = await roomsRef.child(roomId).once("value");
+
+  res.json(roomSnapshot.val());
 });
 
-app.get("/room/:roomId", function (req, res, next) {
+app.get("/room/:roomId", async (req, res) => {
   const roomId = req.params.roomId;
-  const response = {
-    ...rooms[roomId],
-    chats: chatLogs[roomId],
-  };
 
-  res.json(response);
+  const roomSnapshot = await roomsRef.child(roomId).once("value");
+  const chatSnapshot = await chatsRef.child(roomId).once("value");
+
+  res.json({ room: await roomSnapshot.val(), chats: chatSnapshot.val() });
 });
 
 io.on("connection", function (socket) {
-  socket.on("event://send-message", function (msg) {
-    const payload = JSON.parse(msg);
-    if (chatLogs[payload.roomID]) {
-      chatLogs[msg.roomID].push(payload.data);
-    }
+  socket.on("disconnecting", async () => {
+    roomsRef.child(`${socket.roomId}/users/${socket.userId}`).remove();
+    const roomSnapshot = await roomsRef.child(socket.roomId).once("value");
+
+    io.emit(
+      "event://user-connected",
+      JSON.stringify({
+        allUsers: roomSnapshot.val().users,
+      })
+    );
+  });
+
+  socket.on("event://send-message", async (msg) => {
+    const { roomId, data } = JSON.parse(msg);
+
+    db.ref(`chats/${roomId}`).push(data);
 
     socket.broadcast.emit("event://get-message", msg);
   });
 
-  socket.on("event://user-connected", function (msg) {
+  socket.on("event://user-connected", async (msg) => {
     const { roomId, username } = JSON.parse(msg);
 
-    if (rooms[roomId]) {
-      rooms[roomId].users.push(username);
+    const newChild = await roomsRef.child(`${roomId}/users`).push(username);
 
-      io.emit(
-        "event://user-connected",
-        JSON.stringify({
-          allUsers: rooms[roomId].users,
-        })
-      );
-    }
+    socket.userId = newChild.key;
+    socket.roomId = roomId;
+
+    const roomSnapshot = await roomsRef.child(roomId).once("value");
+
+    io.emit(
+      "event://user-connected",
+      JSON.stringify({
+        allUsers: roomSnapshot.val().users,
+      })
+    );
   });
 });
 
