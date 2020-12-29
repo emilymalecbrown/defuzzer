@@ -46,7 +46,7 @@ io.on("connection", function (socket) {
     const roomSnapshot = await roomsRef.child(socket.roomId).once("value");
 
     io.emit(
-      "event://user-connected",
+      "event://user-left",
       JSON.stringify({
         allUsers: roomSnapshot.val().users,
       })

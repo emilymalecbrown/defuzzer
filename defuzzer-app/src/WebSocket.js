@@ -48,6 +48,11 @@ export default ({ children }) => {
       dispatch(updateUsers(payload));
     });
 
+    socket.on("event://user-left", (msg) => {
+      const payload = JSON.parse(msg);
+      dispatch(updateUsers(payload));
+    });
+
     ws = {
       socket: socket,
       sendMessage,
