@@ -3,18 +3,17 @@ import { useSelector, useDispatch } from "react-redux";
 import { useParams, useNavigate } from "react-router-dom";
 import { WebSocketContext } from "src/WebSocket";
 import { setUsername, joinRoom } from "src/actions";
-import { Box, Flex, Input } from "src/styled-components";
+import { Flex, Input } from "src/styled-components";
+import { Participants } from "src/components/Participants";
+import { GuessChat } from "./GuessChat";
 
-export const ChatRoom = () => {
+export const Game = () => {
   const [usernameInput, setUsernameInput] = useState("");
   const [msgInput, setMsgInput] = useState("");
 
   const room = useSelector((state) => state.room);
   const username = useSelector((state) => state.username);
-  const chats = useSelector((state) => state.chatLog);
-  const users = useSelector((state) =>
-    state.users ? Object.values(state.users) : []
-  );
+  const gameStarted = useSelector((state) => state.gameStarted);
 
   const dispatch = useDispatch();
   const ws = useContext(WebSocketContext);
@@ -40,6 +39,12 @@ export const ChatRoom = () => {
     if (isEnter(ev)) sendMessage();
   };
 
+  const handleStartGame = (ev) => {
+    if (!gameStarted) {
+      ws.startGame();
+    }
+  };
+
   const params = useParams();
   const navigate = useNavigate();
 
@@ -49,9 +54,7 @@ export const ChatRoom = () => {
     }
   }, [room, params, navigate, dispatch]);
 
-  if (!room) return null;
-
-  console.log(room);
+  if (!room) return <h1>Oops, cannot find this game.</h1>;
 
   return (
     <div>
@@ -72,40 +75,20 @@ export const ChatRoom = () => {
         </Flex>
       )}
       {username && (
-        <div>
-          <Flex justifyContent={"space-between"}>
-            <div>
-              <ul>
-                {users &&
-                  users.map((user, index) => (
-                    <li key={`${user}-${index}`}>{user}</li>
-                  ))}
-              </ul>
-            </div>
-            <Box width={"60%"}>
-              {chats.map((c, i) => (
-                <Flex
-                  key={i}
-                  display={"flex"}
-                  flexDirection={"column-reverse"}
-                  alignItems={"start"}
-                >
-                  {c.username}: {c.message}
-                </Flex>
-              ))}
-            </Box>
-            <div></div>
-          </Flex>
-          <Flex>
-            <Input
-              type="text"
-              placeholder={"Guess away"}
-              value={msgInput}
-              onChange={(e) => setMsgInput(e.target.value)}
-              onKeyPress={(e) => handleSendMessage(e)}
-            />
-          </Flex>
-        </div>
+        <>
+          <Participants />
+          {!gameStarted && (
+            <button onClick={(ev) => handleStartGame(ev)}>Start Game</button>
+          )}
+          <GuessChat />
+          <Input
+            type="text"
+            placeholder={"Guess away"}
+            value={msgInput}
+            onChange={(e) => setMsgInput(e.target.value)}
+            onKeyPress={(e) => handleSendMessage(e)}
+          />
+        </>
       )}
     </div>
   );

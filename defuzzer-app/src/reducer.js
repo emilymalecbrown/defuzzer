@@ -3,9 +3,11 @@
 import {
   CREATE_ROOM_SUCCESS,
   JOIN_ROOM_SUCCESS,
+  SET_GAME_IMAGES,
   SET_USERNAME,
   UPDATE_CHAT_LOG,
   UPDATE_USERS,
+  SET_START_GAME,
 } from "./actions";
 
 const initialState = {
@@ -40,6 +42,14 @@ export default function chatReducer(state, action) {
       if (state.room !== null && action.update.roomId === state.room.id) {
         state.chatLog = [...state.chatLog, action.update.data];
       }
+      break;
+
+    case SET_START_GAME:
+      state.gameStarted = true;
+      break;
+
+    case SET_GAME_IMAGES:
+      state.setGameImages = action.gameImages;
       break;
 
     default:

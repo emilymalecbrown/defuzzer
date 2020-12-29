@@ -2,7 +2,12 @@ import React, { createContext } from "react";
 import io from "socket.io-client";
 import { WS_BASE, WS_BASE_PRODUCTION } from "./config";
 import { useDispatch } from "react-redux";
-import { updateChatLog, updateUsers } from "./actions";
+import {
+  updateChatLog,
+  updateUsers,
+  setGameImages,
+  setStartGame,
+} from "./actions";
 
 const WebSocketContext = createContext(null);
 
@@ -33,6 +38,10 @@ export default ({ children }) => {
     dispatch(updateUsers(payload));
   };
 
+  const startGame = () => {
+    socket.emit("event://start-game");
+  };
+
   if (!socket) {
     const api =
       process.env.NODE_ENV === "production" ? WS_BASE_PRODUCTION : WS_BASE;
@@ -53,10 +62,17 @@ export default ({ children }) => {
       dispatch(updateUsers(payload));
     });
 
+    socket.on("event://set-game-images", (msg) => {
+      const payload = JSON.parse(msg);
+      dispatch(setStartGame());
+      dispatch(setGameImages(payload));
+    });
+
     ws = {
       socket: socket,
       sendMessage,
       addUser,
+      startGame,
     };
   }
 

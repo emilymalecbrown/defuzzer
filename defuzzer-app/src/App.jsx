@@ -7,7 +7,7 @@ import { lightTheme, darkTheme } from "src/styled-components/themes";
 import { Home } from "src/components/Home";
 import WebSocketProvider from "src/WebSocket";
 import store from "src/store";
-import { ChatRoom } from "./components/ChatRoom";
+import { Game } from "./components/Game";
 import { Header } from "./components/Header";
 
 function App() {
@@ -27,7 +27,7 @@ function App() {
             <BrowserRouter>
               <Routes>
                 <Route path="/" element={<Home />}></Route>
-                <Route path="/room/:id" element={<ChatRoom />}></Route>
+                <Route path="/room/:id" element={<Game />}></Route>
               </Routes>
             </BrowserRouter>
           </div>

@@ -103,3 +103,17 @@ export function updateChatLog(update) {
     update,
   };
 }
+
+export const SET_START_GAME = "SET_START_GAME";
+
+export const setStartGame = () => ({
+  type: SET_START_GAME,
+  gameStarted: true,
+});
+
+export const SET_GAME_IMAGES = "SET_GAME_IMAGES";
+
+export const setGameImages = (payload) => ({
+  type: SET_GAME_IMAGES,
+  gameImages: payload,
+});
